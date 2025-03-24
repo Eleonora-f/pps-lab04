@@ -111,13 +111,13 @@ object SchoolModel:
        */
       def hasCourse(name: String): Boolean
   object BasicSchoolModule extends SchoolModule:
-    override type School = Nothing
-    override type Teacher = Nothing
-    override type Course = Nothing
+    override type School = Sequence[(Teacher, Course)]
+    override type Teacher = String
+    override type Course = String
 
-    def teacher(name: String): Teacher = ???
-    def course(name: String): Course = ???
-    def emptySchool: School = ???
+    def teacher(name: String): Teacher = name
+    def course(name: String): Course = name
+    def emptySchool: School = Nil()
 
     extension (school: School)
       def courses: Sequence[String] = ???
