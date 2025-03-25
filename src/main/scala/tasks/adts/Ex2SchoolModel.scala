@@ -117,7 +117,7 @@ object SchoolModel:
 
     def teacher(name: String): Teacher = name
     def course(name: String): Course = name
-    def emptySchool: School = Nil()
+    def emptySchool: School = ???
 
     extension (school: School)
       def courses: Sequence[String] = ???
