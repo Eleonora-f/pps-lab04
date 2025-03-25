@@ -1,6 +1,8 @@
 package tasks.adts
 import u03.extensionmethods.Optionals.*
 import u03.extensionmethods.Sequences.*
+import u03.extensionmethods.Sequences.Sequence.*
+import u02.Tuples.Tup2
 
 /*  Exercise 2: 
  *  Implement the below trait, and write a meaningful test.
@@ -9,7 +11,6 @@ import u03.extensionmethods.Sequences.*
  *  - For other suggestions look directly to the methods and their description
  */
 object SchoolModel:
-
   trait SchoolModule:
     type School
     type Teacher
@@ -117,15 +118,34 @@ object SchoolModel:
 
     def teacher(name: String): Teacher = name
     def course(name: String): Course = name
-    def emptySchool: School = ???
+    def emptySchool: School = Nil()
 
     extension (school: School)
-      def courses: Sequence[String] = ???
-      def teachers: Sequence[String] = ???
-      def setTeacherToCourse(teacher: Teacher, course: Course): School = ???
-      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = ???
-      def hasTeacher(name: String): Boolean = ???
-      def hasCourse(name: String): Boolean = ???
+      def courses: Sequence[String] = school match
+        case Cons((teacher, course), t) => Cons(course, t.courses)
+        case _ => Nil()
+
+      def teachers: Sequence[String] = school match
+        case Cons((teacher, course), t) => Cons(teacher, t.teachers)
+        case _ => Nil()
+
+      def setTeacherToCourse(teacher: Teacher, course: Course): School =
+        Cons((teacher, course), school)
+
+      def coursesOfATeacher(teacher: Teacher): Sequence[Course] = school match
+        case Cons((t, c), tail) if teacher == t => Cons(c, tail.coursesOfATeacher(teacher))
+        case _ => Nil()
+
+      def hasTeacher(name: String): Boolean = school match
+        case Cons((t, c), tail) if t == name => true
+        case Cons((t, c), tail) => tail.hasTeacher(name)
+        case _ => false
+
+      def hasCourse(name: String): Boolean = school match
+        case Cons((t, c), tail) if c == name => true
+        case Cons((t, c), tail) => tail.hasCourse(name)
+        case _ => false
+
 @main def examples(): Unit =
   import SchoolModel.BasicSchoolModule.*
   val school = emptySchool
@@ -133,6 +153,7 @@ object SchoolModel:
   println(school.courses) // Nil()
   println(school.hasTeacher("John")) // false
   println(school.hasCourse("Math")) // false
+
   val john = teacher("John")
   val math = course("Math")
   val italian = course("Italian")
@@ -142,6 +163,7 @@ object SchoolModel:
   println(school2.hasTeacher("John")) // true
   println(school2.hasCourse("Math")) // true
   println(school2.hasCourse("Italian")) // false
+
   val school3 = school2.setTeacherToCourse(john, italian)
   println(school3.teachers) // Cons("John", Nil())
   println(school3.courses) // Cons("Math", Cons("Italian", Nil()))
